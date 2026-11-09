@@ -83,6 +83,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Helicopter Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 1764765443423142320, guid: 08af8fe6e59ad5c4a89a64bb649f505a, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3073238565062195231, guid: 08af8fe6e59ad5c4a89a64bb649f505a, type: 3}
       propertyPath: maxMissiles
       value: 15
@@ -95,6 +99,10 @@ PrefabInstance:
       propertyPath: missileLaunchPoint
       value: 
       objectReference: {fileID: 5427963224869361501}
+    - target: {fileID: 7896384585408660534, guid: 08af8fe6e59ad5c4a89a64bb649f505a, type: 3}
+      propertyPath: m_Offset.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9195231572467489447, guid: 08af8fe6e59ad5c4a89a64bb649f505a, type: 3}
       propertyPath: m_SortingOrder
       value: 10

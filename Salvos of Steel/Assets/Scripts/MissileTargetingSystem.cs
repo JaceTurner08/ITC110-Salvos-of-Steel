@@ -47,6 +47,10 @@ public class MissileTargetingSystem : MonoBehaviour
     private float lockTimer = 0f;
     private EnemyHealth currentTarget;
 
+    private HelicopterHealth currentHelicopterTarget;
+
+    private Transform currentTargetTransform;
+
     private bool isBigReloading = false;
     private bool isSmallReloading = false;
 
@@ -70,38 +74,70 @@ public class MissileTargetingSystem : MonoBehaviour
         Vector3 worldPosition =
             Camera.main.ScreenToWorldPoint(mousePosition);
 
-        Vector2 mouseWorldPosition = new Vector2(
-            worldPosition.x,
-            worldPosition.y
-        );
+        Vector2 mouseWorldPosition =
+            new Vector2(worldPosition.x, worldPosition.y);
 
-        // Find an enemy underneath the mouse.
-        Collider2D hit = Physics2D.OverlapPoint(
-            mouseWorldPosition,
-            enemyLayer
-        );
+        // Check all colliders beneath the mouse.
+        Collider2D[] hits =
+            Physics2D.OverlapPointAll(mouseWorldPosition);
 
-        EnemyHealth detectedTarget = null;
+        EnemyHealth detectedEnemy = null;
+        HelicopterHealth detectedHelicopter = null;
 
-        if (hit != null)
+        foreach (Collider2D hit in hits)
         {
-            detectedTarget =
-                hit.GetComponentInParent<EnemyHealth>();
+            detectedEnemy = hit.GetComponentInParent<EnemyHealth>();
+
+            detectedHelicopter = hit.GetComponentInParent<HelicopterHealth>();
+
+            if (detectedHelicopter != null)
+            {
+                Debug.Log("HELICOPTER TARGET ACQUIRED!");
+            }
+            else
+            {
+                Debug.Log("Collider detected, but no HelicopterHealth found.");
+            }
+
+            Debug.Log("Collider found: " + hit.name);
+
+            if (detectedEnemy != null || detectedHelicopter != null)
+            {
+                break;
+            }
         }
 
-        // Check whether the target has changed.
-        if (detectedTarget != currentTarget)
+        // Determine which object is being targeted.
+        Transform detectedTransform = null;
+
+        if (detectedEnemy != null)
         {
-            currentTarget = detectedTarget;
+            detectedTransform = detectedEnemy.transform;
+        }
+        else if (detectedHelicopter != null)
+        {
+            detectedTransform = detectedHelicopter.transform;
+        }
+
+        // Reset lock-on if the target changes.
+        if (detectedTransform != currentTargetTransform)
+        {
+            currentTarget = detectedEnemy;
+            currentHelicopterTarget = detectedHelicopter;
+
+            currentTargetTransform = detectedTransform;
+
             lockTimer = 0f;
         }
 
-        // Build the lock-on timer.
-        if (currentTarget != null)
+        // Continue the lock-on countdown.
+        if (currentTargetTransform != null)
         {
             lockTimer += Time.deltaTime;
 
             lockTimer = Mathf.Min(lockTimer, lockOnTime);
+
+            Debug.Log("LOCK TIMER: " + lockTimer);
         }
         else
         {
@@ -111,11 +147,11 @@ public class MissileTargetingSystem : MonoBehaviour
         // Fire big missile with left mouse button.
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            if (IsTargetLocked() && bigMissiles > 0)
+            if (currentTarget != null && IsTargetLocked() && bigMissiles > 0)
             {
                 bigMissiles--;
                 
-                FireMissile(bigMissilePrefab, bigMissileDamage);
+                FireMissile(bigMissilePrefab, bigMissileDamage, false);
 
                 if (!isBigReloading)
                 {
@@ -127,11 +163,13 @@ public class MissileTargetingSystem : MonoBehaviour
         // Fire small missile with right mouse button.
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
-            if (IsTargetLocked() && smallMissiles > 0)
+            if (IsTargetLocked() && currentTargetTransform != null && smallMissiles > 0)
             {
+                bool allowHelicopterDamage = currentHelicopterTarget != null;
+
                 smallMissiles--;
 
-                FireMissile(smallMissilePrefab, smallMissileDamage);
+                FireMissile(smallMissilePrefab, smallMissileDamage, allowHelicopterDamage);
 
                 if (!isSmallReloading)
                 {
@@ -143,14 +181,17 @@ public class MissileTargetingSystem : MonoBehaviour
 
     bool IsTargetLocked()
     {
-        return currentTarget != null &&
-               lockTimer >= lockOnTime;
+        return currentTarget != null && lockTimer >= lockOnTime;
+       
+        Debug.Log("Target: " + currentTargetTransform + " | Lock Timer: " + lockTimer + " / " + lockOnTime);
     }
 
-    void FireMissile(GameObject missilePrefab, float damage)
+    void FireMissile(GameObject missilePrefab, float damage, bool allowHelicopterDamage = false)
     {
-        if (missilePrefab == null || missileLaunchPoint == null || currentTarget == null)
+        if (missilePrefab == null || missileLaunchPoint == null || currentTargetTransform == null)
+        {
             return;
+        }
 
         GameObject missile = Instantiate(missilePrefab, missileLaunchPoint.position, missileLaunchPoint.rotation);
 
@@ -158,10 +199,9 @@ public class MissileTargetingSystem : MonoBehaviour
 
         if (projectile != null)
         {
-            projectile.SetTarget(currentTarget.transform, damage);
+            projectile.SetTarget(currentTargetTransform, damage, allowHelicopterDamage);
         }
     }
-
 
     private IEnumerator ReloadBigMissiles()
     {

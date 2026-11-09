@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0abfa1076f27e664f85f65f77a3451a0
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - targetingCirclePrefab: {fileID: 8018963190792146376, guid: 37027f967927bd849962a24520af300f, type: 3}
+  - airplanePrefab: {fileID: 2497842996382607745, guid: cb18e1872c5eae643911014e94cb4a14, type: 3}
+  - explosionPrefab: {fileID: 6579239263026134700, guid: 7c8c7476275ac5e43bc25068a181a93a, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -819,6 +819,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2748072926994292640, guid: ca7f91c2b22a4c744a8efbf568864066, type: 3}
+      propertyPath: bigMissileDamage
+      value: 5877
+      objectReference: {fileID: 0}
+    - target: {fileID: 2748072926994292640, guid: ca7f91c2b22a4c744a8efbf568864066, type: 3}
+      propertyPath: smallMissileDamage
+      value: 4489
+      objectReference: {fileID: 0}
     - target: {fileID: 5335309455288509051, guid: ca7f91c2b22a4c744a8efbf568864066, type: 3}
       propertyPath: m_Name
       value: Medium Ship
@@ -896,6 +904,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5335309455288509051, guid: ca7f91c2b22a4c744a8efbf568864066, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2014940914}
+    - targetCorrespondingSourceObject: {fileID: 5335309455288509051, guid: ca7f91c2b22a4c744a8efbf568864066, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2014940916}
+    - targetCorrespondingSourceObject: {fileID: 5335309455288509051, guid: ca7f91c2b22a4c744a8efbf568864066, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2014940922}
+    - targetCorrespondingSourceObject: {fileID: 5335309455288509051, guid: ca7f91c2b22a4c744a8efbf568864066, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2014940923}
   m_SourcePrefab: {fileID: 100100000, guid: ca7f91c2b22a4c744a8efbf568864066, type: 3}
 --- !u!1001 &768814491
 PrefabInstance:
@@ -1752,6 +1769,109 @@ MonoBehaviour:
   damagingLayers:
     serializedVersion: 2
     m_Bits: 64
+--- !u!114 &2014940916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2014940907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72c55af91e2b6a84a87bf2f339cbf217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PowerupInventory
+  emergencyFuelCount: 1
+  airstrikeCount: 1
+--- !u!114 &2014940922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2014940907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0abfa1076f27e664f85f65f77a3451a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  targetingCirclePrefab: {fileID: 8018963190792146376, guid: 37027f967927bd849962a24520af300f, type: 3}
+  airplanePrefab: {fileID: 2497842996382607745, guid: cb18e1872c5eae643911014e94cb4a14, type: 3}
+  explosionPrefab: {fileID: 6579239263026134700, guid: 7c8c7476275ac5e43bc25068a181a93a, type: 3}
+  planeArrivalDelay: 6
+  planeFlightDuration: 1.5
+  explosionDelay: 0.5
+  explosionAnimationDuration: 2
+--- !u!114 &2014940923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2014940907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b68a25214aad15544a487238b023937a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  shipVisuals: {fileID: 0}
+--- !u!1001 &1869243606096987488
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3011713492030048175, guid: 62bae3b7e11d1704ba8c9e1e1dccd277, type: 3}
+      propertyPath: m_Name
+      value: SmokeScreen
+      objectReference: {fileID: 0}
+    - target: {fileID: 5171520390050683960, guid: 62bae3b7e11d1704ba8c9e1e1dccd277, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 5171520390050683960, guid: 62bae3b7e11d1704ba8c9e1e1dccd277, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -11.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 5171520390050683960, guid: 62bae3b7e11d1704ba8c9e1e1dccd277, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5171520390050683960, guid: 62bae3b7e11d1704ba8c9e1e1dccd277, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5171520390050683960, guid: 62bae3b7e11d1704ba8c9e1e1dccd277, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5171520390050683960, guid: 62bae3b7e11d1704ba8c9e1e1dccd277, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5171520390050683960, guid: 62bae3b7e11d1704ba8c9e1e1dccd277, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5171520390050683960, guid: 62bae3b7e11d1704ba8c9e1e1dccd277, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5171520390050683960, guid: 62bae3b7e11d1704ba8c9e1e1dccd277, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5171520390050683960, guid: 62bae3b7e11d1704ba8c9e1e1dccd277, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 62bae3b7e11d1704ba8c9e1e1dccd277, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1763,3 +1883,4 @@ SceneRoots:
   - {fileID: 416791742}
   - {fileID: 688029727}
   - {fileID: 768814491}
+  - {fileID: 1869243606096987488}

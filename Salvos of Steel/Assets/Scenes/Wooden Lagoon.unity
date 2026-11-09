@@ -173,6 +173,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Heavy Ship Variant (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 3318767444182290298, guid: 23b05e2870e29bb458b788b516ad242f, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3534335379509441323, guid: 23b05e2870e29bb458b788b516ad242f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 7.9991226
@@ -786,11 +790,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 3534335379509441323, guid: 23b05e2870e29bb458b788b516ad242f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2010986624}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3318767444182290298, guid: 23b05e2870e29bb458b788b516ad242f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 589636109}
+    - targetCorrespondingSourceObject: {fileID: 3318767444182290298, guid: 23b05e2870e29bb458b788b516ad242f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 589636115}
+    - targetCorrespondingSourceObject: {fileID: 3318767444182290298, guid: 23b05e2870e29bb458b788b516ad242f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 589636116}
   m_SourcePrefab: {fileID: 100100000, guid: 23b05e2870e29bb458b788b516ad242f, type: 3}
 --- !u!1 &589636108 stripped
 GameObject:
@@ -815,6 +828,39 @@ MonoBehaviour:
   damagingLayers:
     serializedVersion: 2
     m_Bits: 64
+--- !u!4 &589636114 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3534335379509441323, guid: 23b05e2870e29bb458b788b516ad242f, type: 3}
+  m_PrefabInstance: {fileID: 589636107}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &589636115
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 589636108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b810aa34281486b428f409b6d97ca66a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HelicopterDeployment
+  helicopterPrefab: {fileID: 5758018610559920261, guid: e037582ffd39c644a99114491ac6f72f, type: 3}
+  helicopterSpawnPoint: {fileID: 2010986624}
+--- !u!114 &589636116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 589636108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72c55af91e2b6a84a87bf2f339cbf217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PowerupInventory
+  emergencyFuelCount: 1
+  airstrikeCount: 0
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -2048,7 +2094,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cf8cb9d7b6fb904a814720c4e3a0e3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  maxHealth: 80000
+  maxHealth: 100000
 --- !u!1 &1829091612
 GameObject:
   m_ObjectHideFlags: 0
@@ -2481,6 +2527,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 257556404}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2010986623
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2010986624}
+  m_Layer: 0
+  m_Name: HelicopterLaunchPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2010986624
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2010986623}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -3.92, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 589636114}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2052692905
 GameObject:
