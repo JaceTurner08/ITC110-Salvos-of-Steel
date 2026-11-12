@@ -19,13 +19,16 @@ public class MainMenu : MonoBehaviour
     public void level1Select ()
     {
         Debug.Log("Tropical Madness Selected.");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
     public void level2Select()
     {
         Debug.Log("Iceberg Quarters Selected.");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 2);
     }
     public void level3Select()
     {
         Debug.Log("Wooden Lagoon Selected.");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3);
     }
 }
