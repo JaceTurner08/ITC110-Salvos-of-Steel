@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7106310272051544777}
   - component: {fileID: 5008257600015657876}
   - component: {fileID: 1107997605204918044}
+  - component: {fileID: -6607836963836853936}
   m_Layer: 0
   m_Name: SmokeScreen
   m_TagString: Untagged
@@ -147,3 +148,16 @@ MonoBehaviour:
   smokeOpacity: 0.5
   poppingSound: {fileID: 0}
   soundVolume: 1
+--- !u!114 &-6607836963836853936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3011713492030048175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d0c3a463f85c24449c27be26fb86c2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SmokeScreenArea
+  fadeInDuration: 2

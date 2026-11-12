@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PowerupInventory : MonoBehaviour
@@ -9,6 +8,9 @@ public class PowerupInventory : MonoBehaviour
 
     [Header("Smoke Screen Inventory")]
     public int smokeScreenCount = 0;
+
+    [Header("Interception Inventory")]
+    public int interceptionCount = 0;
 
     public void AddSmokeScreen()
     {
@@ -26,6 +28,12 @@ public class PowerupInventory : MonoBehaviour
     {
         airstrikeCount++;
         Debug.Log("Airstrike collected! Total: " + airstrikeCount);
+    }
+
+    public void AddInterception()
+    {
+        interceptionCount++;
+        Debug.Log("Interception System collected! Total: " + interceptionCount);
     }
 
     public bool UseEmergencyFuel()
@@ -55,6 +63,15 @@ public class PowerupInventory : MonoBehaviour
         return true;
     }
 
+    public bool UseInterception()
+    {
+        if (interceptionCount <= 0)
+            return false;
+
+        interceptionCount--;
+        return true;
+    }
+
     void OnGUI()
     {
         GUIStyle style = new GUIStyle();
@@ -80,6 +97,16 @@ public class PowerupInventory : MonoBehaviour
             style
         );
 
-        GUI.Label(new Rect(Screen.width - 230, 110, 220, 30), "3 - Smoke Screen: " + smokeScreenCount, style);
+        GUI.Label(
+            new Rect(Screen.width - 230, 110, 250, 30),
+            "3 - Smoke Screen: " + smokeScreenCount,
+            style
+        );
+
+        GUI.Label(
+            new Rect(Screen.width - 230, 140, 250, 30),
+            "4 - Interception: " + interceptionCount,
+            style
+        );
     }
 }

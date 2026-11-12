@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(ShipDamageFireEffects))]
 public class PlayerHealth : MonoBehaviour
 {
     [Header("Player Health")]
@@ -13,10 +14,15 @@ public class PlayerHealth : MonoBehaviour
     public LayerMask damagingLayers;
 
     private bool isDestroyed = false;
+    private ShipDamageFireEffects fireEffects;
+
+    void Awake()
+    {
+        fireEffects = GetComponent<ShipDamageFireEffects>();
+    }
 
     void Start()
     {
-        // Give the player full health when the game starts.
         currentHealth = maxHealth;
     }
 
@@ -26,11 +32,11 @@ public class PlayerHealth : MonoBehaviour
             return;
 
         currentHealth -= damage;
-
-        // Prevent health from going below zero.
         currentHealth = Mathf.Max(currentHealth, 0);
 
         Debug.Log("Player Health: " + currentHealth + " / " + maxHealth);
+
+        fireEffects.UpdateFireEffects(currentHealth, maxHealth);
 
         if (currentHealth <= 0)
         {
@@ -41,7 +47,6 @@ public class PlayerHealth : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // Check whether the object belongs to a damaging layer.
         if ((damagingLayers.value & (1 << collision.gameObject.layer)) != 0)
         {
             TakeDamage(collisionDamage);

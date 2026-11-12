@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using System.Collections;
 
@@ -18,9 +17,10 @@ public class DummyMissileShooter : MonoBehaviour
 
     public int bigMissileCount = 4;
     public int smallMissileCount = 4;
-    public float firingInterval = 0.5f;
 
-    private bool hasFired = false;
+    [Header("Firing Timing")]
+    public float firingInterval = 0.5f;
+    public float repeatDelay = 5f;
 
     void Start()
     {
@@ -29,7 +29,8 @@ public class DummyMissileShooter : MonoBehaviour
             bigMissilePrefab == null ||
             smallMissilePrefab == null)
         {
-            Debug.LogError("Dummy Missile Shooter is missing an assignment!", this);
+            Debug.LogError(
+                "Dummy Missile Shooter is missing an assignment!", this);
             return;
         }
 
@@ -38,98 +39,88 @@ public class DummyMissileShooter : MonoBehaviour
 
     IEnumerator FireMissileSequence()
     {
-        if (hasFired) yield break;
-
-        hasFired = true;
-
-        int bigFired = 0;
-        int smallFired = 0;
-
-        int totalMissiles = bigMissileCount + smallMissileCount;
-
-        for (int i = 0; i < totalMissiles; i++)
+        while (true)
         {
-            bool fireBig =
-                bigFired < bigMissileCount &&
-                (smallFired >= smallMissileCount || i % 2 == 0);
+            int bigFired = 0;
+            int smallFired = 0;
 
-            GameObject prefab = fireBig
-                ? bigMissilePrefab
-                : smallMissilePrefab;
+            int totalMissiles = bigMissileCount + smallMissileCount;
 
-            GameObject missile = Instantiate(
-                prefab,
-                missileLaunchPoint.position,
-                missileLaunchPoint.rotation
-            );
-
-            if (fireBig)
+            for (int i = 0; i < totalMissiles; i++)
             {
+                bool fireBig =
+                    bigFired < bigMissileCount &&
+                    (smallFired >= smallMissileCount || i % 2 == 0);
+
+                GameObject prefab = fireBig
+                    ? bigMissilePrefab
+                    : smallMissilePrefab;
+
+                GameObject missile = Instantiate(
+                    prefab,
+                    missileLaunchPoint.position,
+                    missileLaunchPoint.rotation
+                );
+
                 MissileProjectile script =
                     missile.GetComponentInChildren<MissileProjectile>();
 
                 if (script != null)
                 {
+                    float damage = fireBig
+                        ? bigMissileDamage
+                        : smallMissileDamage;
+
                     script.SetTarget(
                         playerTarget,
-                        bigMissileDamage,
+                        damage,
                         false,
                         true
                     );
 
-                    bigFired++;
+                    if (fireBig)
+                        bigFired++;
+                    else
+                        smallFired++;
                 }
                 else
                 {
-                    Debug.LogError("Big missile prefab has no MissileProjectile script!");
-                    Destroy(missile);
-                }
-            }
-            else
-            {
-                smallMissile script =
-                    missile.GetComponentInChildren<smallMissile>();
-
-                if (script != null)
-                {
-                    script.SetTarget(
-                        playerTarget,
-                        smallMissileDamage,
-                        true
+                    Debug.LogError(
+                        "Missile prefab is missing MissileProjectile!",
+                        missile
                     );
 
-                    smallFired++;
-                }
-                else
-                {
-                    Debug.LogError("Small missile prefab has no smallMissile script!");
                     Destroy(missile);
+                    yield return new WaitForSeconds(firingInterval);
+                    continue;
                 }
-            }
 
-            // Prevent missiles from hitting their launching ship.
-            Collider2D[] missileColliders =
-                missile.GetComponentsInChildren<Collider2D>();
+                Collider2D[] missileColliders =
+                    missile.GetComponentsInChildren<Collider2D>();
 
-            Collider2D[] shooterColliders =
-                GetComponentsInChildren<Collider2D>();
+                Collider2D[] shooterColliders =
+                    GetComponentsInChildren<Collider2D>();
 
-            foreach (Collider2D missileCollider in missileColliders)
-            {
-                foreach (Collider2D shooterCollider in shooterColliders)
+                foreach (Collider2D missileCollider in missileColliders)
                 {
-                    Physics2D.IgnoreCollision(
-                        missileCollider,
-                        shooterCollider
-                    );
+                    foreach (Collider2D shooterCollider in shooterColliders)
+                    {
+                        Physics2D.IgnoreCollision(
+                            missileCollider,
+                            shooterCollider
+                        );
+                    }
                 }
+
+                Debug.Log("Dummy fired: " + prefab.name);
+
+                yield return new WaitForSeconds(firingInterval);
             }
 
-            Debug.Log("Dummy fired: " + prefab.name);
+            Debug.Log("DUMMY FINISHED FIRING! Next salvo in " +
+                repeatDelay + " seconds.");
 
-            yield return new WaitForSeconds(firingInterval);
+            yield return new WaitForSeconds(repeatDelay);
         }
-
-        Debug.Log("DUMMY HAS FIRED ALL MISSILES!");
     }
 }

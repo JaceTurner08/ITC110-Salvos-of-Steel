@@ -6,16 +6,19 @@ public class smallMissile : MonoBehaviour
 {
     [Header("Missile Settings")]
     public float speed = 0.05f;
-    [Header("Homing Settings")]
-public float turnSpeed = 90f;
     public float damage = 4500f;
     public float lifetime = 10f;
+
+    [Header("Homing Settings")]
+    [Tooltip("Maximum rotation speed in degrees per second.")]
+    public float turnSpeed = 100f;
 
     private Transform target;
     private bool canDamagePlayer = false;
 
     private bool guidanceDisabled = false;
     private Vector2 unguidedDirection;
+
     private Coroutine guidanceCoroutine;
 
     public void SetTarget(
@@ -41,27 +44,53 @@ public float turnSpeed = 90f;
             return;
         }
 
-        if (!guidanceDisabled)
+        if (guidanceDisabled)
         {
-            Vector2 direction =
-                (Vector2)target.position - (Vector2)transform.position;
-
-            transform.up = direction;
-
-            transform.position = Vector2.MoveTowards(
-                transform.position,
-                target.position,
-                speed * Time.deltaTime
-            );
+            // Continue flying straight during chaff disruption.
+            transform.up = unguidedDirection;
         }
         else
         {
-            // Fly straight while guidance is disrupted.
-            transform.up = unguidedDirection;
+            // Calculate direction toward the target.
+            Vector2 directionToTarget =
+                (Vector2)target.position -
+                (Vector2)transform.position;
 
-            transform.position +=
-                (Vector3)(unguidedDirection * speed * Time.deltaTime);
+            if (directionToTarget.sqrMagnitude > 0.0001f)
+            {
+                directionToTarget.Normalize();
+
+                // Calculate current and desired angles.
+                float currentAngle =
+                    Mathf.Atan2(transform.up.y, transform.up.x)
+                    * Mathf.Rad2Deg;
+
+                float targetAngle =
+                    Mathf.Atan2(directionToTarget.y, directionToTarget.x)
+                    * Mathf.Rad2Deg;
+
+                // Gradually rotate toward the target.
+                float newAngle = Mathf.MoveTowardsAngle(
+                    currentAngle,
+                    targetAngle,
+                    turnSpeed * Time.deltaTime
+                );
+
+                // Apply the new rotation.
+                float radians = newAngle * Mathf.Deg2Rad;
+
+                Vector2 newDirection = new Vector2(
+                    Mathf.Cos(radians),
+                    Mathf.Sin(radians)
+                );
+
+                transform.up = newDirection;
+            }
         }
+
+        // Continue moving forward.
+        transform.position +=
+            (Vector3)(transform.up * speed * Time.deltaTime);
     }
 
     public bool IsTargeting(Transform possibleTarget)
@@ -73,21 +102,15 @@ public float turnSpeed = 90f;
     {
         if (!guidanceDisabled)
         {
-            if (target != null)
-            {
-                unguidedDirection =
-                    ((Vector2)target.position - (Vector2)transform.position).normalized;
-            }
-            else
-            {
-                unguidedDirection = transform.up;
-            }
+            unguidedDirection = transform.up.normalized;
         }
 
         guidanceDisabled = true;
 
         if (guidanceCoroutine != null)
+        {
             StopCoroutine(guidanceCoroutine);
+        }
 
         guidanceCoroutine = StartCoroutine(RestoreGuidance(duration));
     }
@@ -99,7 +122,7 @@ public float turnSpeed = 90f;
         guidanceDisabled = false;
         guidanceCoroutine = null;
 
-        Debug.Log("Small missile has reacquired its target!");
+        Debug.Log("SMALL MISSILE GUIDANCE RESTORED!");
     }
 
     private void OnTriggerEnter2D(Collider2D other)

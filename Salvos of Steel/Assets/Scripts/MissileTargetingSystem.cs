@@ -8,300 +8,377 @@ public class MissileTargetingSystem : MonoBehaviour
     public GameObject bigMissilePrefab;
     public GameObject smallMissilePrefab;
 
-    [Header("Launch Position")]
+    [Header("Launch Settings")]
     public Transform missileLaunchPoint;
 
-    [Header("Targeting")]
+    [Header("Targeting Settings")]
     public float lockOnTime = 5f;
     public LayerMask enemyLayer;
 
-    [Header("Big Missiles")]
+    [Header("Big Missile Settings")]
     public int maxBigMissiles = 4;
-    public float bigMissileDamage = 8000f;
-    public float bigMissileReload = 10f;
-
-    [Header("Small Missiles")]
-    public int maxSmallMissiles = 4;
-    public float smallMissileDamage = 4500f;
-    public float smallMissileReload = 5f;
-
-    [Header("Ammo Count")]
     public int maxBigMissileAmmo = 4;
-    public int maxSmallMissileAmmo = 4;
-
+    public float bigMissileDamage = 6000f;
     public float bigMissileReloadTime = 10f;
+
+    [Header("Small Missile Settings")]
+    public int maxSmallMissiles = 4;
+    public int maxSmallMissileAmmo = 4;
+    public float smallMissileDamage = 2500f;
     public float smallMissileReloadTime = 5f;
 
-    [Header("Helicopter UI")]
-    public float helicopterInitialCooldown = 15f;
-    public float helicopterCooldown = 60f;
-    private float helicopterTimer;
-    private bool helicopterReady = false;
-    private bool helicopterDeployed = false;
-    private bool bigMissileReloading = false;
-    private bool smallMissileReloading = false;
+    [Header("Targeting UI")]
+    public Vector2 uiPosition = new Vector2(20f, 100f);
 
-    private int bigMissiles;
-    private int smallMissiles;
+    private int bigMissilesRemaining;
+    private int smallMissilesRemaining;
 
-    private float lockTimer = 0f;
-    private EnemyHealth currentTarget;
+    private bool bigMissileReloading;
+    private bool smallMissileReloading;
 
-    private HelicopterHealth currentHelicopterTarget;
+    private float bigReloadTimer;
+    private float smallReloadTimer;
 
-    private Transform currentTargetTransform;
+    private Transform currentTarget;
+    private float currentLockTime;
+    private bool targetLocked;
 
-    private bool isBigReloading = false;
-    private bool isSmallReloading = false;
+    private Camera mainCamera;
 
     void Start()
     {
-        bigMissiles = maxBigMissiles;
-        smallMissiles = maxSmallMissiles;
-        helicopterTimer = helicopterInitialCooldown;
+        mainCamera = Camera.main;
+
+        bigMissilesRemaining = maxBigMissileAmmo;
+        smallMissilesRemaining = maxSmallMissileAmmo;
     }
 
     void Update()
     {
-        UpdateHelicopterTimer();
+        UpdateTargeting();
 
         if (Mouse.current == null)
             return;
 
-        // Convert mouse position into world coordinates.
-        Vector3 mousePosition = Mouse.current.position.ReadValue();
-
-        Vector3 worldPosition =
-            Camera.main.ScreenToWorldPoint(mousePosition);
-
-        Vector2 mouseWorldPosition =
-            new Vector2(worldPosition.x, worldPosition.y);
-
-        // Check all colliders beneath the mouse.
-        Collider2D[] hits =
-            Physics2D.OverlapPointAll(mouseWorldPosition);
-
-        EnemyHealth detectedEnemy = null;
-        HelicopterHealth detectedHelicopter = null;
-
-        foreach (Collider2D hit in hits)
-        {
-            detectedEnemy = hit.GetComponentInParent<EnemyHealth>();
-
-            detectedHelicopter = hit.GetComponentInParent<HelicopterHealth>();
-
-            if (detectedHelicopter != null)
-            {
-                Debug.Log("HELICOPTER TARGET ACQUIRED!");
-            }
-            else
-            {
-                Debug.Log("Collider detected, but no HelicopterHealth found.");
-            }
-
-            Debug.Log("Collider found: " + hit.name);
-
-            if (detectedEnemy != null || detectedHelicopter != null)
-            {
-                break;
-            }
-        }
-
-        // Determine which object is being targeted.
-        Transform detectedTransform = null;
-
-        if (detectedEnemy != null)
-        {
-            detectedTransform = detectedEnemy.transform;
-        }
-        else if (detectedHelicopter != null)
-        {
-            detectedTransform = detectedHelicopter.transform;
-        }
-
-        // Reset lock-on if the target changes.
-        if (detectedTransform != currentTargetTransform)
-        {
-            currentTarget = detectedEnemy;
-            currentHelicopterTarget = detectedHelicopter;
-
-            currentTargetTransform = detectedTransform;
-
-            lockTimer = 0f;
-        }
-
-        // Continue the lock-on countdown.
-        if (currentTargetTransform != null)
-        {
-            lockTimer += Time.deltaTime;
-
-            lockTimer = Mathf.Min(lockTimer, lockOnTime);
-
-            Debug.Log("LOCK TIMER: " + lockTimer);
-        }
-        else
-        {
-            lockTimer = 0f;
-        }
-
-        // Fire big missile with left mouse button.
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            if (currentTarget != null && IsTargetLocked() && bigMissiles > 0)
-            {
-                bigMissiles--;
-                
-                FireMissile(bigMissilePrefab, bigMissileDamage, false);
-
-                if (!isBigReloading)
-                {
-                    StartCoroutine(ReloadBigMissiles());
-                }
-            }
+            if (targetLocked)
+                FireBigMissile();
         }
 
-        // Fire small missile with right mouse button.
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
-            if (IsTargetLocked() && currentTargetTransform != null && smallMissiles > 0)
-            {
-                bool allowHelicopterDamage = currentHelicopterTarget != null;
-
-                smallMissiles--;
-
-                FireMissile(smallMissilePrefab, smallMissileDamage, allowHelicopterDamage);
-
-                if (!isSmallReloading)
-                {
-                    StartCoroutine(ReloadSmallMissiles());
-                }
-            }
+            if (targetLocked)
+                FireSmallMissile();
         }
     }
 
-    bool IsTargetLocked()
+    void UpdateTargeting()
     {
-        return currentTarget != null && lockTimer >= lockOnTime;
-       
-        Debug.Log("Target: " + currentTargetTransform + " | Lock Timer: " + lockTimer + " / " + lockOnTime);
-    }
+        if (mainCamera == null)
+            mainCamera = Camera.main;
 
-    void FireMissile(GameObject missilePrefab, float damage, bool allowHelicopterDamage = false)
-    {
-        if (missilePrefab == null || missileLaunchPoint == null || currentTargetTransform == null)
+        if (mainCamera == null || Mouse.current == null)
         {
+            ResetTargeting();
             return;
         }
 
-        GameObject missile = Instantiate(missilePrefab, missileLaunchPoint.position, missileLaunchPoint.rotation);
+        Vector2 mousePosition =
+            Mouse.current.position.ReadValue();
 
-        MissileProjectile projectile = missile.GetComponent<MissileProjectile>();
+        Vector3 worldPosition =
+            mainCamera.ScreenToWorldPoint(mousePosition);
 
-        if (projectile != null)
+        Collider2D hit = Physics2D.OverlapPoint(
+            new Vector2(worldPosition.x, worldPosition.y),
+            enemyLayer
+        );
+
+        Transform newTarget = null;
+
+        if (hit != null)
         {
-            projectile.SetTarget(currentTargetTransform, damage, allowHelicopterDamage);
+            EnemyHealth enemy =
+                hit.GetComponentInParent<EnemyHealth>();
+
+            HelicopterHealth helicopter =
+                hit.GetComponentInParent<HelicopterHealth>();
+
+            if (enemy != null)
+                newTarget = enemy.transform;
+            else if (helicopter != null)
+                newTarget = helicopter.transform;
+        }
+
+        if (newTarget == null)
+        {
+            ResetTargeting();
+            return;
+        }
+
+        // Prevent locking when both ships are inside the same smoke circle.
+        if (SmokeScreenArea.AreBothInsideSameSmoke(transform, newTarget))
+        {
+            ResetTargeting();
+            return;
+        }
+
+        // Reset the lock timer when changing targets.
+        if (currentTarget != newTarget)
+        {
+            currentTarget = newTarget;
+            currentLockTime = 0f;
+            targetLocked = false;
+        }
+
+        if (!targetLocked)
+        {
+            currentLockTime += Time.deltaTime;
+
+            if (currentLockTime >= lockOnTime)
+            {
+                targetLocked = true;
+                Debug.Log("TARGET LOCKED: " + currentTarget.name);
+            }
         }
     }
 
-    private IEnumerator ReloadBigMissiles()
+    void ResetTargeting()
+    {
+        currentTarget = null;
+        currentLockTime = 0f;
+        targetLocked = false;
+    }
+
+    void FireBigMissile()
+    {
+        if (bigMissilesRemaining <= 0)
+        {
+            Debug.Log("NO BIG MISSILES AVAILABLE!");
+            return;
+        }
+
+        if (bigMissilePrefab == null ||
+            missileLaunchPoint == null)
+        {
+            Debug.LogError("Big missile prefab or launch point is missing!");
+            return;
+        }
+
+        FireMissile(
+            bigMissilePrefab,
+            bigMissileDamage,
+            true
+        );
+
+        bigMissilesRemaining--;
+
+        if (!bigMissileReloading &&
+            bigMissilesRemaining < maxBigMissileAmmo)
+        {
+            StartCoroutine(ReloadBigMissiles());
+        }
+    }
+
+    void FireSmallMissile()
+    {
+        if (smallMissilesRemaining <= 0)
+        {
+            Debug.Log("NO SMALL MISSILES AVAILABLE!");
+            return;
+        }
+
+        if (smallMissilePrefab == null ||
+            missileLaunchPoint == null)
+        {
+            Debug.LogError("Small missile prefab or launch point is missing!");
+            return;
+        }
+
+        FireMissile(
+            smallMissilePrefab,
+            smallMissileDamage,
+            true
+        );
+
+        smallMissilesRemaining--;
+
+        if (!smallMissileReloading &&
+            smallMissilesRemaining < maxSmallMissileAmmo)
+        {
+            StartCoroutine(ReloadSmallMissiles());
+        }
+    }
+
+    void FireMissile(
+        GameObject missilePrefab,
+        float damage,
+        bool allowHelicopterDamage = false)
+    {
+        if (currentTarget == null)
+            return;
+
+        GameObject missile = Instantiate(
+            missilePrefab,
+            missileLaunchPoint.position,
+            missileLaunchPoint.rotation
+        );
+
+        MissileProjectile projectile =
+            missile.GetComponentInChildren<MissileProjectile>();
+
+        if (projectile == null)
+        {
+            Debug.LogError(
+                "Missile prefab is missing MissileProjectile!",
+                missile
+            );
+
+            Destroy(missile);
+            return;
+        }
+
+        projectile.SetTarget(
+            currentTarget,
+            damage,
+            allowHelicopterDamage,
+            false
+        );
+
+        Debug.Log(
+            "Fired " + missilePrefab.name +
+            " at " + currentTarget.name
+        );
+    }
+
+    IEnumerator ReloadBigMissiles()
     {
         bigMissileReloading = true;
+        bigReloadTimer = bigMissileReloadTime;
 
-        // Wait for 10 seconds.
         yield return new WaitForSeconds(bigMissileReloadTime);
 
-        // Restore all big missiles simultaneously.
-        bigMissiles = maxBigMissileAmmo;
+        // Refill all big missile ammunition at once.
+        bigMissilesRemaining = maxBigMissileAmmo;
 
+        bigReloadTimer = 0f;
         bigMissileReloading = false;
+
+        Debug.Log("BIG MISSILES FULLY RELOADED!");
     }
 
-    private IEnumerator ReloadSmallMissiles()
+    IEnumerator ReloadSmallMissiles()
     {
         smallMissileReloading = true;
+        smallReloadTimer = smallMissileReloadTime;
 
-        // Wait for 5 seconds.
         yield return new WaitForSeconds(smallMissileReloadTime);
 
-        // Restore all small missiles simultaneously.
-        smallMissiles = maxSmallMissileAmmo;
+        // Refill all small missile ammunition at once.
+        smallMissilesRemaining = maxSmallMissileAmmo;
 
+        smallReloadTimer = 0f;
         smallMissileReloading = false;
+
+        Debug.Log("SMALL MISSILES FULLY RELOADED!");
     }
 
-    void UpdateHelicopterTimer()
-    {
-        if (helicopterTimer > 0f)
-        {
-            helicopterTimer -= Time.deltaTime;
-            helicopterTimer = Mathf.Max(0f, helicopterTimer);
-        }
-
-        if (helicopterTimer <= 0f && !helicopterDeployed)
-        {
-            helicopterReady = true;
-        }
-    }
-
-
-    // Display ammunition and targeting status.
     void OnGUI()
     {
-        GUI.Label(
-            new Rect(20, 20, 250, 25),
-            "BIG MISSILES: " + bigMissiles + "/" + maxBigMissiles
-        );
+        GUIStyle titleStyle = new GUIStyle(GUI.skin.label);
+        titleStyle.fontSize = 17;
+        titleStyle.fontStyle = FontStyle.Bold;
+        titleStyle.normal.textColor = Color.white;
+
+        GUIStyle normalStyle = new GUIStyle(GUI.skin.label);
+        normalStyle.fontSize = 14;
+        normalStyle.normal.textColor = Color.white;
+
+        float x = uiPosition.x;
+        float y = uiPosition.y;
 
         GUI.Label(
-            new Rect(20, 45, 250, 25),
-            "SMALL MISSILES: " + smallMissiles + "/" + maxSmallMissiles
+            new Rect(x, y, 250, 25),
+            "MISSILE SYSTEM",
+            titleStyle
         );
+
+        y += 25;
+
+        GUI.Label(
+            new Rect(x, y, 250, 22),
+            "BIG MISSILES: " +
+            bigMissilesRemaining + "/" +
+            maxBigMissileAmmo,
+            normalStyle
+        );
+
+        y += 22;
+
+        if (bigMissileReloading)
+        {
+            GUI.Label(
+                new Rect(x, y, 250, 22),
+                "Big Reload: " +
+                Mathf.Max(0f, bigReloadTimer).ToString("F1") + "s",
+                normalStyle
+            );
+
+            y += 22;
+        }
+
+        GUI.Label(
+            new Rect(x, y, 250, 22),
+            "SMALL MISSILES: " +
+            smallMissilesRemaining + "/" +
+            maxSmallMissileAmmo,
+            normalStyle
+        );
+
+        y += 22;
+
+        if (smallMissileReloading)
+        {
+            GUI.Label(
+                new Rect(x, y, 250, 22),
+                "Small Reload: " +
+                Mathf.Max(0f, smallReloadTimer).ToString("F1") + "s",
+                normalStyle
+            );
+
+            y += 22;
+        }
+
+        y += 8;
 
         if (currentTarget != null)
         {
-            GUI.Label(
-                new Rect(20, 75, 300, 25),
-                "TARGET LOCK: " +
-                Mathf.Clamp(lockTimer, 0, lockOnTime).ToString("F1")
-                + " / " + lockOnTime + " seconds"
-            );
-
-            if (IsTargetLocked())
+            if (targetLocked)
             {
                 GUI.Label(
-                    new Rect(20, 100, 250, 25),
-                    "TARGET LOCKED - FIRE"
+                    new Rect(x, y, 300, 25),
+                    "TARGET LOCKED: " + currentTarget.name,
+                    titleStyle
+                );
+            }
+            else
+            {
+                GUI.Label(
+                    new Rect(x, y, 300, 25),
+                    "LOCKING: " +
+                    currentLockTime.ToString("F1") +
+                    " / " + lockOnTime + "s",
+                    normalStyle
                 );
             }
         }
         else
         {
             GUI.Label(
-                new Rect(20, 75, 250, 25),
-                "SEARCHING FOR TARGET..."
-            );
-        }
-
-        if (helicopterDeployed)
-        {
-            GUI.Label(
-                new Rect(20, 130, 300, 25),
-                "HELICOPTER DEPLOYED"
-            );
-        }
-        else if (helicopterReady)
-        {
-            GUI.Label(
-                new Rect(20, 130, 300, 25),
-                "HELICOPTER READY - PRESS H"
-            );
-        }
-        else
-        {
-            GUI.Label(
-                new Rect(20, 130, 300, 25),
-                "HELICOPTER READY IN: " +
-                Mathf.CeilToInt(helicopterTimer) + "s"
+                new Rect(x, y, 300, 25),
+                "NO TARGET",
+                normalStyle
             );
         }
     }

@@ -108,6 +108,7 @@ MonoBehaviour:
   speed: 2
   damage: 6000
   lifetime: 10
+  turnSpeed: 45
 --- !u!61 &1382713414412071133
 BoxCollider2D:
   m_ObjectHideFlags: 0

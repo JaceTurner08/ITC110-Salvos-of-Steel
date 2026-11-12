@@ -5,17 +5,27 @@ public class MissileProjectile : MonoBehaviour
 {
     [Header("Missile Settings")]
     public float speed = 0.01f;
-    [Header("Homing Settings")]
-    public float turnSpeed = 90f;
     public float damage = 6000f;
     public float lifetime = 10f;
 
+    [Header("Homing Settings")]
+    [Tooltip("Maximum rotation speed in degrees per second.")]
+    public float turnSpeed = 60f;
+
     private Transform target;
+
     private bool canDamageHelicopter = false;
     private bool canDamagePlayer = false;
 
+    // Separate disruption states.
+    private bool chaffDisabled = false;
+    private bool smokeDisabled = false;
+    private bool permanentlyDisabled = false;
+
     private bool guidanceDisabled = false;
+
     private Vector2 unguidedDirection;
+
     private Coroutine guidanceCoroutine;
 
     public void SetTarget(
@@ -26,6 +36,7 @@ public class MissileProjectile : MonoBehaviour
     {
         target = newTarget;
         damage = missileDamage;
+
         canDamageHelicopter = allowHelicopterDamage;
         canDamagePlayer = allowPlayerDamage;
     }
@@ -43,27 +54,65 @@ public class MissileProjectile : MonoBehaviour
             return;
         }
 
-        if (!guidanceDisabled)
+        // Check whether the target is inside active smoke.
+        smokeDisabled =
+            SmokeScreenArea.IsPointInsideActiveSmoke(target.position);
+
+        bool shouldDisableGuidance =
+            chaffDisabled ||
+            smokeDisabled ||
+            permanentlyDisabled;
+
+        // Capture the current direction when guidance first stops.
+        if (shouldDisableGuidance && !guidanceDisabled)
         {
-            Vector2 direction =
-                (Vector2)target.position - (Vector2)transform.position;
+            unguidedDirection = transform.up.normalized;
+        }
 
-            transform.up = direction;
+        guidanceDisabled = shouldDisableGuidance;
 
-            transform.position = Vector2.MoveTowards(
-                transform.position,
-                target.position,
-                speed * Time.deltaTime
-            );
+        if (guidanceDisabled)
+        {
+            transform.up = unguidedDirection;
         }
         else
         {
-            // Continue flying in the direction the missile was already travelling.
-            transform.up = unguidedDirection;
+            Vector2 directionToTarget =
+                (Vector2)target.position -
+                (Vector2)transform.position;
 
-            transform.position +=
-                (Vector3)(unguidedDirection * speed * Time.deltaTime);
+            if (directionToTarget.sqrMagnitude > 0.0001f)
+            {
+                directionToTarget.Normalize();
+
+                float currentAngle =
+                    Mathf.Atan2(transform.up.y, transform.up.x)
+                    * Mathf.Rad2Deg;
+
+                float targetAngle =
+                    Mathf.Atan2(directionToTarget.y, directionToTarget.x)
+                    * Mathf.Rad2Deg;
+
+                float newAngle = Mathf.MoveTowardsAngle(
+                    currentAngle,
+                    targetAngle,
+                    turnSpeed * Time.deltaTime
+                );
+
+                float radians = newAngle * Mathf.Deg2Rad;
+
+                Vector2 newDirection = new Vector2(
+                    Mathf.Cos(radians),
+                    Mathf.Sin(radians)
+                );
+
+                transform.up = newDirection;
+            }
         }
+
+        // The missile always continues moving forward.
+        transform.position +=
+            (Vector3)(transform.up * speed * Time.deltaTime);
     }
 
     public bool IsTargeting(Transform possibleTarget)
@@ -71,44 +120,57 @@ public class MissileProjectile : MonoBehaviour
         return target == possibleTarget;
     }
 
+    // Existing temporary chaff disruption.
     public void DisableGuidance(float duration)
     {
-        // Preserve the missile's current flight direction.
-        if (!guidanceDisabled)
+        if (!chaffDisabled && !guidanceDisabled)
         {
-            if (target != null)
-            {
-                unguidedDirection =
-                    ((Vector2)target.position - (Vector2)transform.position).normalized;
-            }
-            else
-            {
-                unguidedDirection = transform.up;
-            }
+            unguidedDirection = transform.up.normalized;
         }
 
-        guidanceDisabled = true;
+        chaffDisabled = true;
 
-        // Restart the disruption timer if guidance is disabled again.
         if (guidanceCoroutine != null)
+        {
             StopCoroutine(guidanceCoroutine);
+        }
 
-        guidanceCoroutine = StartCoroutine(RestoreGuidance(duration));
+        guidanceCoroutine = StartCoroutine(
+            RestoreGuidance(duration)
+        );
     }
 
     private IEnumerator RestoreGuidance(float duration)
     {
         yield return new WaitForSeconds(duration);
 
-        guidanceDisabled = false;
+        chaffDisabled = false;
         guidanceCoroutine = null;
 
-        Debug.Log("Big missile has reacquired its target!");
+        Debug.Log("BIG MISSILE CHAFF DISRUPTION ENDED!");
+    }
+
+    // New permanent interception disruption.
+    public void PermanentlyDisableGuidance()
+    {
+        if (permanentlyDisabled)
+            return;
+
+        if (!guidanceDisabled)
+        {
+            unguidedDirection = transform.up.normalized;
+        }
+
+        permanentlyDisabled = true;
+        guidanceDisabled = true;
+
+        Debug.Log("MISSILE PERMANENTLY INTERCEPTED: " + name);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        EnemyHealth enemy = other.GetComponentInParent<EnemyHealth>();
+        EnemyHealth enemy =
+            other.GetComponentInParent<EnemyHealth>();
 
         if (enemy != null)
         {
