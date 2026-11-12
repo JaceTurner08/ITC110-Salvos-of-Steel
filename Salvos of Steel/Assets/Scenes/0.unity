@@ -2263,6 +2263,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0d1f7c13bf14f7940bba32bbd9588e8d, type: 3}
+--- !u!1 &801066792
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 801066793}
+  m_Layer: 3
+  m_Name: EnemyFrontFire
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &801066793
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 801066792}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.42, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1866456345}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &841794057
 GameObject:
   m_ObjectHideFlags: 0
@@ -2842,6 +2873,37 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!1 &1039802886
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1039802887}
+  m_Layer: 0
+  m_Name: BackFire
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1039802887
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1039802886}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -1.36, z: 0}
+  m_LocalScale: {x: 1.45, y: 1.45, z: 1.45}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 1043952669}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1043952663 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3834409117620096577, guid: 910fde1af0f884a46ace4774b91d1bb5, type: 3}
@@ -3003,8 +3065,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShipDamageFireEffects
   firePrefab: {fileID: 2481281718400746129, guid: 72bed01c32ee4314d878920c37701be1, type: 3}
-  frontFirePoint: {fileID: 0}
-  backFirePoint: {fileID: 0}
+  frontFirePoint: {fileID: 1346485193}
+  backFirePoint: {fileID: 1039802887}
 --- !u!1 &1143568556
 GameObject:
   m_ObjectHideFlags: 0
@@ -3520,6 +3582,37 @@ Transform:
   - {fileID: 1240752225}
   - {fileID: 1143568558}
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1346485192
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1346485193}
+  m_Layer: 0
+  m_Name: FrontFire
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1346485193
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1346485192}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.52, z: 0}
+  m_LocalScale: {x: 1.43, y: 1.43, z: 1.43}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 1043952669}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1419828125
 PrefabInstance:
@@ -4494,6 +4587,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1952365309}
+  - {fileID: 801066793}
+  - {fileID: 1978653396}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 178.752}
 --- !u!114 &1866456346
@@ -4531,8 +4626,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShipDamageFireEffects
   firePrefab: {fileID: 2481281718400746129, guid: 72bed01c32ee4314d878920c37701be1, type: 3}
-  frontFirePoint: {fileID: 0}
-  backFirePoint: {fileID: 0}
+  frontFirePoint: {fileID: 801066793}
+  backFirePoint: {fileID: 1978653396}
 --- !u!1 &1893897410
 GameObject:
   m_ObjectHideFlags: 0
@@ -4724,6 +4819,37 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &1978653395
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1978653396}
+  m_Layer: 3
+  m_Name: EnemyBackFire
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1978653396
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1978653395}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -1.45, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1866456345}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2043555531
 GameObject:
   m_ObjectHideFlags: 0
@@ -5130,6 +5256,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6774338351205541396, guid: 910fde1af0f884a46ace4774b91d1bb5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 229001395}
+    - targetCorrespondingSourceObject: {fileID: 6774338351205541396, guid: 910fde1af0f884a46ace4774b91d1bb5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1346485193}
+    - targetCorrespondingSourceObject: {fileID: 6774338351205541396, guid: 910fde1af0f884a46ace4774b91d1bb5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1039802887}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3834409117620096577, guid: 910fde1af0f884a46ace4774b91d1bb5, type: 3}
       insertIndex: -1
