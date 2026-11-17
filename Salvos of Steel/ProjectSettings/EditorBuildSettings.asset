@@ -9,6 +9,12 @@ EditorBuildSettings:
     path: Assets/Scenes/menu.unity
     guid: c863d790c853c5042ab7c007b39958f0
   - enabled: 1
+    path: Assets/Scenes/Shipselect.unity
+    guid: 36d9aaa945d1b2a4a85cabda8e5b1dc2
+  - enabled: 1
+    path: Assets/Scenes/Shipselect2.unity
+    guid: 9046f1b43bfc9ac4aa5854b1ef9aca5d
+  - enabled: 1
     path: Assets/Scenes/LevelSelectMenu.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
