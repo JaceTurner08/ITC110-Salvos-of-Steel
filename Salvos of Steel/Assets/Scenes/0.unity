@@ -2961,7 +2961,7 @@ MonoBehaviour:
   emergencyFuelCount: 1
   airstrikeCount: 1
   smokeScreenCount: 1
-  interceptionCount: 0
+  interceptionCount: 1
 --- !u!114 &1043952678
 MonoBehaviour:
   m_ObjectHideFlags: 0
